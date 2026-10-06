@@ -244,7 +244,7 @@ function FolderMenu({
         <MenuButton className="acpmux-location-button" label={label}>
           <LocationFace icon={<FolderIcon />} value={value} chevron />
         </MenuButton>
-        <MenuPopup className="acpmux-menu acpmux-location-menu" align="end">
+        <MenuPopup className="acpmux-menu acpmux-location-menu" side="top" align="end">
           {folders.length > 0 && (
             <>
               <div className="acpmux-location-folders">
@@ -343,7 +343,7 @@ function LocationPicker({
           <MenuButton className="acpmux-location-button" label={label}>
             {button}
           </MenuButton>
-          <MenuPopup className="acpmux-menu acpmux-location-menu" align="start">
+          <MenuPopup className="acpmux-menu acpmux-location-menu" side="top" align="start">
             <MenuRadioGroup value={selected ?? ""} onValueChange={pick}>
               {options.map((option) => (
                 <MenuRadioItem key={option.id} value={option.id} className="acpmux-menu-item">
@@ -384,6 +384,7 @@ function LocationPicker({
         anchor={open ? trigger.current : null}
         label={label}
         className="acpmux-menu acpmux-location-menu"
+        side="top"
       >
         <Combobox
           suggestions={suggestions}

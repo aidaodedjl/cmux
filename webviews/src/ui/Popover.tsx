@@ -42,8 +42,9 @@ export function virtualAnchor(anchor: UiAnchor) {
 export interface PopoverProps {
   open: boolean;
   onOpenChange(open: boolean): void;
-  /** Where it opens; it opens below. */
+  /** Where it opens relative to the anchor. */
   anchor: UiAnchor;
+  side?: "top" | "bottom";
   /** The accessible name of the popover (role dialog). */
   label: string;
   className?: string;
@@ -58,6 +59,7 @@ export function Popover({
   open,
   onOpenChange,
   anchor,
+  side = "bottom",
   label,
   className,
   initialFocus,
@@ -71,7 +73,7 @@ export function Popover({
         <BasePopover.Positioner
           className="ui-positioner"
           anchor={virtualAnchor(anchor)}
-          side="bottom"
+          side={side}
           align="start"
           sideOffset={UI_ANCHOR_GAP}
         >

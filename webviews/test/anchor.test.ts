@@ -5,7 +5,7 @@ import { resolveUiOverlayPosition, useUiAnchor, UI_ANCHOR_GAP, type UiAnchorSide
 
 const menuCases: Array<{ name: string; side: UiAnchorSide }> = [
   { name: "composer-plus", side: "above" },
-  { name: "composer-computer", side: "below" },
+  { name: "composer-computer", side: "above" },
   { name: "composer-folder", side: "above" },
   { name: "model", side: "above" },
   { name: "effort", side: "above" },
