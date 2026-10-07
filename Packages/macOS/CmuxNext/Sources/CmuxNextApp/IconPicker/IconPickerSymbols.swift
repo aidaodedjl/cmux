@@ -3,38 +3,15 @@ import CoreText
 import CmuxNextDesign
 import CmuxNextPages
 
-/// SF Symbols for the icon picker's Symbols tab: the names this Mac draws,
-/// and each visible cell's image, drawn on request (the page never bundles
-/// symbol images). `cmux-page://cmux.icon-picker/__symbol/<name>.png` is a
+/// SF Symbols for the icon picker's Symbols tab: each visible cell's image,
+/// drawn on request (the page never bundles symbol images; the names come from
+/// ``IconPickerSymbolCatalog``). `cmux-page://cmux.icon-picker/__symbol/<name>.png` is a
 /// black template image; the page tints it with its theme color (CSS mask).
 @MainActor
 final class IconPickerSymbols: PageDynamicResourceSource {
     nonisolated static let prefix = "__symbol"
     /// Points of the drawn symbol; the page shows it at 24 px (2x for Retina).
     static let pointSize: CGFloat = 48
-
-    nonisolated static let systemCatalog =
-        URL(fileURLWithPath: "/System/Library/CoreServices/CoreGlyphs.bundle/Contents/Resources/name_availability.plist")
-
-    /// The Symbols tab's names, sorted: the bundled snapshot (the symbols the deployment target
-    /// draws, scripts/cmux-next/gen-sf-symbol-names.py) plus the names a newer system's catalog
-    /// adds. A missing or unreadable system catalog leaves the snapshot, so the tab is never empty.
-    /// Both files are read off the main actor.
-    @concurrent nonisolated static func names(catalog: URL = systemCatalog) async -> [String] {
-        // concurrency-allow: @concurrent, so these file reads never run on the main actor
-        var names = Set(snapshot(Bundle.module.url(forResource: "IconPickerSymbols", withExtension: "txt")))
-        if let plist = NSDictionary(contentsOf: catalog), let symbols = plist["symbols"] as? [String: Any] {
-            names.formUnion(symbols.keys.filter(IconValue.isSymbolName))
-        }
-        return names.sorted()
-    }
-
-    /// The bundled snapshot (Resources/IconPickerSymbols.txt), one name per line.
-    private nonisolated static func snapshot(_ url: URL?) -> [String] {
-        // concurrency-allow: called only from the @concurrent names(catalog:)
-        guard let url, let text = try? String(contentsOf: url, encoding: .utf8) else { return [] }
-        return text.split(separator: "\n").map(String.init).filter(IconValue.isSymbolName)
-    }
 
     /// The newest Emoji version (times 10) the system emoji font draws, so the picker hides
     /// emoji that would show as empty boxes: one new single code point per version, newest first.

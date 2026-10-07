@@ -11,11 +11,9 @@ struct IconPickerHostTests {
     @Test func sessionOpensOnTheCurrentIconsKind() {
         let none = IconPickerSession(id: "s", current: nil)
         #expect(none.tab == "emoji" && !none.canClear)
-        let symbol = IconPickerSession(id: "s", current: "star.fill", symbols: ["star"], maxEmojiVersion: 160)
+        let symbol = IconPickerSession(id: "s", current: "star.fill")
         #expect(symbol.tab == "symbol" && symbol.canClear)
         #expect(symbol.event["value"] == .string("star.fill"))
-        #expect(symbol.event["symbols"] == .array([.string("star")]))
-        #expect(symbol.event["maxEmojiVersion"] == JSONValue(160))
         #expect(IconPickerSession(id: "s", current: "🚀").tab == "emoji")
         // A stored value the rule does not accept offers no Remove (nothing valid to remove).
         #expect(!IconPickerSession(id: "s", current: "not an icon").canClear)
@@ -66,21 +64,5 @@ struct IconPickerHostTests {
         #expect(IconPickerSymbols.name(for: request(["star.fill"])) == nil)
         #expect(IconPickerSymbols.png("star.fill") != nil)
         #expect(IconPickerSymbols.png("no.such.symbol.zz") == nil)
-    }
-
-    /// The Symbols tab is never empty: the bundled snapshot when the system catalog is missing,
-    /// plus any newer names the running system lists.
-    @Test func symbolNamesFallBackToTheBundledSnapshot() async throws {
-        let missing = await IconPickerSymbols.names(catalog: URL(fileURLWithPath: "/nonexistent/name_availability.plist"))
-        #expect(missing.count > 5_000)
-        #expect(missing.contains("star.fill") && missing == missing.sorted())
-
-        let catalog = FileManager.default.temporaryDirectory.appendingPathComponent("icon-picker-\(UUID().uuidString).plist")
-        defer { try? FileManager.default.removeItem(at: catalog) }
-        let plist: NSDictionary = ["symbols": ["zz.newer.symbol": "2099", "star.fill": "2019", "Bad Name": "2019"]]
-        #expect(plist.write(to: catalog, atomically: true))
-        let merged = await IconPickerSymbols.names(catalog: catalog)
-        #expect(merged.contains("zz.newer.symbol") && merged.contains("star.fill") && !merged.contains("Bad Name"))
-        #expect(merged.count == missing.count + 1)
     }
 }
