@@ -62,6 +62,8 @@ public final class SidebarView: NSView {
     let updateCardView = SidebarUpdateCardView()
     /// Back, in the footer band's spot while a destination is open (`SidebarView+Back`).
     let backButton = SidebarBackButton()
+    /// The "Did you know" card in the same slot (`SidebarModel.tipCard`).
+    let tipCardView = SidebarTipCardView()
     /// Where the spaces dots sit (`sidebar.spacesPosition`, R109).
     public var spacesPosition: SpacesPosition = .bottom {
         didSet { if spacesPosition != oldValue { needsLayout = true } }
@@ -329,6 +331,7 @@ public final class SidebarView: NSView {
         var titlebarHeight: CGFloat
         var updateCard: SidebarUpdateCard?
         var showsBack: Bool
+        var tipCard: SidebarTipCard?
     }
 
     private func observe() {
@@ -354,7 +357,8 @@ public final class SidebarView: NSView {
                     fontSize: Typography.body.pointSize,
                     titlebarHeight: Metrics.titlebarHeight,
                     updateCard: model.updateCard,
-                    showsBack: model.showsBack
+                    showsBack: model.showsBack,
+                    tipCard: model.tipCard
                 )
             }) {
                 self?.render(state)
@@ -389,8 +393,9 @@ public final class SidebarView: NSView {
                 list.reload(animated: Self.animatesReload(from: previous, to: state.sections))
             }
         }
-        if lastState?.updateCard != state.updateCard {
+        if lastState?.updateCard != state.updateCard || lastState?.tipCard != state.tipCard {
             updateCardView.configure(state.updateCard)
+            tipCardView.configure(state.tipCard)
             needsLayout = true
         }
         if chromeChanged || profilesChanged || lastState?.showsBack != state.showsBack { needsLayout = true }
