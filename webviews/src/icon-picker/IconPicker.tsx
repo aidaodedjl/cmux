@@ -7,6 +7,7 @@ import type { Strings } from "../pages/shared/i18n";
 import { AssetTab, type IconAssetSink } from "./AssetTab";
 import type { SkinTone } from "./emojiData";
 import type { IconValue } from "./iconValue";
+import { JumpBar } from "./JumpBar";
 import { pickerKeyAction } from "./keyboard";
 import { CELL_SIZE, PickerStore, type PickerCell, type PickerTab } from "./store";
 import { GridViewport, VirtualGrid } from "./VirtualGrid";
@@ -42,6 +43,10 @@ export function IconPicker({ store, strings, onPick, onCancel, onClear, assets, 
   const pick = (cell: PickerCell | undefined) => {
     if (cell) onPick(store.pick(cell));
   };
+  const jump = (top: number | null) => {
+    if (top !== null) viewport.scrollTo(top);
+  };
+  const symbolMask = (name: string) => (symbolImageURL ? { maskImage: `url("${symbolImageURL(name)}")` } : undefined);
   const switchTab = (tab: PickerTab) => {
     store.setTab(tab);
     viewport.scrollToTop();
@@ -71,6 +76,8 @@ export function IconPicker({ store, strings, onPick, onCancel, onClear, assets, 
         return pick(store.activeCell() ?? undefined);
       case "cancel":
         return toneOpen ? setToneOpen(false) : onCancel();
+      case "section":
+        return jump(store.jumpBy(action.step));
       case "tab": {
         const next = (PICKER_TABS.indexOf(snap.tab) + action.step + PICKER_TABS.length) % PICKER_TABS.length;
         return switchTab(PICKER_TABS[next]);
@@ -156,6 +163,16 @@ export function IconPicker({ store, strings, onPick, onCancel, onClear, assets, 
               </div>
             )}
           </div>
+          {snap.jumps.length > 0 && (
+            <JumpBar
+              jumps={snap.jumps}
+              layout={snap.layout}
+              viewport={viewport}
+              label={t("iconPicker.categories")}
+              onJump={(id) => jump(store.jump(id))}
+              symbolStyle={symbolMask}
+            />
+          )}
           <VirtualGrid
             layout={snap.layout}
             viewport={viewport}
